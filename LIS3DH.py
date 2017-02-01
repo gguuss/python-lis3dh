@@ -12,7 +12,7 @@
 #  - https://github.com/adafruit/Adafruit_LIS3DH
 #  - https://www.adafruit.com/datasheets/LIS3DH.pdf
 
-from Adafruit_I2C import Adafruit_I2C
+import Adafruit_GPIO.I2C as I2C 
 import RPi.GPIO as GPIO        #needed for Hardware interrupt
 
 class LIS3DH:
@@ -87,11 +87,11 @@ class LIS3DH:
    AXIS_Y        = 0x01
    AXIS_Z        = 0x02
 
-   def __init__(self, address=0x18, bus=-1, debug=False):
+   def __init__(self, address=0x18, bus=1, debug=False):
       self.isDebug = debug
       self.debug("Initialising LIS3DH")
 
-      self.i2c = Adafruit_I2C(address, busnum=bus)
+      self.i2c = I2C.Device(address, busnum=bus)
       self.address = address
 
       try:
@@ -100,8 +100,8 @@ class LIS3DH:
             raise Exception("Device ID incorrect - expected 0x%X, got 0x%X at address 0x%X" % (self.DEVICE_ID, val, self.address))
          self.debug("Successfully connected to LIS3DH at address 0x%X" % (self.address))
       except Exception as e:
-         print "Error establishing connection with LIS3DH"
-         print e
+         print("Error establishing connection with LIS3DH")
+         print(e)
 
       # Enable all axis
       self.setAxisStatus(self.AXIS_X, True)
@@ -261,10 +261,10 @@ class LIS3DH:
    def dumpRegisters(self):
       for x in range(0x0, 0x3D):
          read = self.i2c.readU8(x)
-         print "%X: %s" % (x, bin(read))
+         print("%X: %s" % (x, bin(read)))
 
    def debug(self, message):
       if not self.isDebug: return
-      print message
+      print(message)
 
 
