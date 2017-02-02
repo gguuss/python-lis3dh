@@ -132,6 +132,17 @@ class LIS3DH:
    def getZ(self):
       return self.getAxis(self.AXIS_Z)
 
+   def getADC(self, channel=None):
+      base = self.REG_OUTADC1_L + (2 * channel) # Determine which register we need to read from (2 per axis)
+      self.i2c.write8(base, 0x80)
+      low = self.i2c.readU8(base) # Read the first register (lower bits)
+      high = self.i2c.readU8(base + 1) # Read the next register (higher bits)
+      res = low | (high << 8) # Combine the two components
+      res = self.twosComp(res) # Calculate the twos compliment of the result
+      #  print res
+      volt = translate(res, 32512, -32512, 900, 1800)
+      return volt
+
    # Get a reading from the desired axis
    def getAxis(self, axis):
       base = self.REG_OUT_X_L + (2 * axis) # Determine which register we need to read from (2 per axis)
