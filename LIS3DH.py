@@ -20,10 +20,10 @@ class LIS3DH:
    i2c = None
 
    # Ranges
-   RANGE_2G	= 0b00
-   RANGE_4G	= 0b01
-   RANGE_8G	= 0b10
-   RANGE_16G	= 0b11
+   RANGE_2G    = 0b00
+   RANGE_4G    = 0b01
+   RANGE_8G    = 0b10
+   RANGE_16G    = 0b11
 
    # Refresh rates
    DATARATE_400HZ          = 0b0111 # 400Hz 
@@ -77,7 +77,7 @@ class LIS3DH:
 
    # Values
    DEVICE_ID     = 0x33
-   INT_IO		 = 0x04        # GPIO pin for interrupt
+   INT_IO         = 0x04        # GPIO pin for interrupt
    CLK_NONE      = 0x00
    CLK_SINGLE    = 0x01
    CLK_DOUBLE    = 0x02
@@ -86,6 +86,10 @@ class LIS3DH:
    AXIS_X        = 0x00
    AXIS_Y        = 0x01
    AXIS_Z        = 0x02
+
+   ADC_1        = 0x00
+   ADC_2        = 0x01
+   ADC_3        = 0x02
 
    def __init__(self, address=0x18, bus=1, debug=False):
       self.isDebug = debug
@@ -173,17 +177,17 @@ class LIS3DH:
    def setAxisStatus(self, axis, enable):
        if axis<0 or axis>2:
            raise Exception("Tried to modify invalid axis")
-		
+        
        current = self.i2c.readU8(self.REG_CTRL1)
        status = 1 if enable else 0
        final = self.setBit(current, axis, status)
        self.writeRegister(self.REG_CTRL1, final)
-	   
+       
    def setInterrupt(self,mycallback):
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM) # remove for CHIP
         GPIO.setup(self.INT_IO, GPIO.IN)
         GPIO.add_event_detect(self.INT_IO, GPIO.RISING, callback=mycallback)
-	
+    
    def setClick(self,clickmode,clickthresh=80,timelimit=10,timelatency=20,timewindow=100,mycallback=None):
         if (clickmode==self.CLK_NONE):
             val = self.i2c.readU8(self.REG_CTRL3) # Get value from register
@@ -193,7 +197,7 @@ class LIS3DH:
             return
         self.writeRegister(self.REG_CTRL3, 0x80)  # turn on int1 click
         self.writeRegister(self.REG_CTRL5, 0x08)  # latch interrupt on int1
-		
+        
         if (clickmode == self.CLK_SINGLE):
             self.writeRegister(self.REG_CLICKCFG, 0x15) # turn on all axes & singletap
         if (clickmode == self.CLK_DOUBLE):
@@ -267,4 +271,15 @@ class LIS3DH:
       if not self.isDebug: return
       print(message)
 
+def translate(value, leftMin, leftMax, rightMin, rightMax):
+    # Figure out how 'wide' each range is
+    leftSpan = leftMax - leftMin
+    rightSpan = rightMax - rightMin
+
+
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - leftMin) / float(leftSpan)
+
+    # Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan)
 

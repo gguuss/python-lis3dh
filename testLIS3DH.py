@@ -25,7 +25,7 @@ if __name__ == '__main__':
         y = sensor.getY()
         z = sensor.getZ()
 
-# raw values
+	# raw values
         print("\rX: %.6f\tY: %.6f\tZ: %.6f" % (x,y,z))
         sleep(0.1)
 		
