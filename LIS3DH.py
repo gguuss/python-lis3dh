@@ -112,6 +112,9 @@ class LIS3DH:
       self.setAxisStatus(self.AXIS_Y, True)
       self.setAxisStatus(self.AXIS_Z, True)
 
+      # Enable ADC
+      self.writeRegister(self.REG_TEMPCFG, 0x80)
+
       # Set 400Hz refresh rate
       self.setDataRate(self.DATARATE_400HZ)
 
