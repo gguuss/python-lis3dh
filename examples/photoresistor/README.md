@@ -21,7 +21,7 @@ Connect a resistor (10k):
 Connect the photoresister circuit:
   * Resistor / Photoresistor out to A1/A2/A3
 
-![wiring diagram](https://github.com/gguuss/python_lis3dh/raw/master/examples/photoresistor/wiring.png)
+![wiring diagram](https://raw.githubusercontent.com/gguuss/python-lis3dh/new-adafruit-lib/examples/photoresistor/wiring.png)
 
 ## Running the sample
 * Configure all requisite modules
